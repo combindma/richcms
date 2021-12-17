@@ -17,8 +17,30 @@
     ],
     "require": {
         "php": "^8.0",
+        "armincms/option": "^0.1.4",
+        "artesaos/seotools": "^0.20",
+        "bensampo/laravel-enum": "^4.1",
+        "combindma/backup": "^1.0",
+        "combindma/blog": "1.0.9.1",
+        "combindma/dashui": "^1.5",
+        "combindma/flash": "^1.0",
+        "combindma/gallery": "^1.0",
+        "combindma/laravel-facebook-pixel": "^1.0",
+        "combindma/newsletter": "^2.0",
+        "combindma/recaptcha": "^1.0",
+        "combindma/redirector": "^1.0",
+        "elegantweb/sanitizer": "^1.1",
+        "illuminate/contracts": "^8.73",
+        "illuminatech/validation-composite": "^1.2",
+        "laravelium/sitemap": "^8.0",
+        "propaganistas/laravel-disposable-email": "^2.1",
+        "spatie/laravel-googletagmanager": "^2.6",
+        "spatie/laravel-medialibrary": "^9.11",
         "spatie/laravel-package-tools": "^1.9.2",
-        "illuminate/contracts": "^8.73"
+        "spatie/laravel-permission": "^5.4",
+        "tucker-eric/eloquentfilter": "^3.0",
+        "vinkla/hashids": "^9.1",
+        "watson/active": "^6.0"
     },
     "require-dev": {
         "nunomaduro/collision": "^5.10",
@@ -36,7 +58,10 @@
         "psr-4": {
             "Combindma\\Richcms\\": "src",
             "Combindma\\Richcms\\Database\\Factories\\": "database/factories"
-        }
+        },
+        "files": [
+            "src/helpers.php"
+        ]
     },
     "autoload-dev": {
         "psr-4": {

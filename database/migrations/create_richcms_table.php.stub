@@ -1,19 +1,176 @@
 <?php
 
+use Combindma\Richcms\Enums\Roles;
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
+use Spatie\Permission\Models\Role;
 
-return new class extends Migration
-{
+return new class extends Migration {
     public function up()
     {
-        Schema::create('richcms_table', function (Blueprint $table) {
-            $table->id();
+        $tableNames = config('permission.table_names');
+        $columnNames = config('permission.column_names');
 
-            // add fields
+        if (empty($tableNames)) {
+            throw new \Exception('Error: config/permission.php not found and defaults could not be merged. Please publish the package configuration before proceeding.');
+        }
 
+        Schema::create($tableNames['permissions'], function (Blueprint $table) {
+            $table->id('id');
+            $table->string('name');
+            $table->string('guard_name');
             $table->timestamps();
         });
+
+        Schema::create($tableNames['roles'], function (Blueprint $table) {
+            $table->id('id');
+            $table->string('name');
+            $table->string('guard_name');
+            $table->timestamps();
+        });
+
+        Schema::create($tableNames['model_has_permissions'], function (Blueprint $table) use ($tableNames, $columnNames) {
+            $table->unsignedBigInteger('permission_id');
+            $table->string('model_type');
+            $table->unsignedBigInteger($columnNames['model_morph_key']);
+            $table->index([$columnNames['model_morph_key'], 'model_type'], 'model_has_permissions_model_id_model_type_index');
+
+            $table->foreign('permission_id')
+                ->references('id')
+                ->on($tableNames['permissions'])
+                ->onDelete('cascade');
+
+            $table->primary(['permission_id', $columnNames['model_morph_key'], 'model_type'],
+                'model_has_permissions_permission_model_type_primary');
+        });
+
+        Schema::create($tableNames['model_has_roles'], function (Blueprint $table) use ($tableNames, $columnNames) {
+            $table->unsignedBigInteger('role_id');
+
+            $table->string('model_type');
+            $table->unsignedBigInteger($columnNames['model_morph_key']);
+            $table->index([$columnNames['model_morph_key'], 'model_type'], 'model_has_roles_model_id_model_type_index');
+
+            $table->foreign('role_id')
+                ->references('id')
+                ->on($tableNames['roles'])
+                ->onDelete('cascade');
+
+            $table->primary(['role_id', $columnNames['model_morph_key'], 'model_type'],
+                'model_has_roles_role_model_type_primary');
+        });
+
+        Schema::create($tableNames['role_has_permissions'], function (Blueprint $table) use ($tableNames) {
+            $table->unsignedBigInteger('permission_id');
+            $table->unsignedBigInteger('role_id');
+
+            $table->foreign('permission_id')
+                ->references('id')
+                ->on($tableNames['permissions'])
+                ->onDelete('cascade');
+
+            $table->foreign('role_id')
+                ->references('id')
+                ->on($tableNames['roles'])
+                ->onDelete('cascade');
+
+            $table->primary(['permission_id', 'role_id'], 'role_has_permissions_permission_id_role_id_primary');
+        });
+
+        app('cache')
+            ->store(config('permission.cache.store') != 'default' ? config('permission.cache.store') : null)
+            ->forget(config('permission.cache.key'));
+
+        foreach(Roles::getValues() as $role)
+        {
+            Role::create(['name' => $role]);
+        }
+
+        Schema::create('users', function (Blueprint $table) {
+            $table->id();
+            $table->string('name', 150)->nullable();
+            $table->string('email', 150)->unique()->nullable();
+            $table->string('password')->nullable();
+            $table->string('phone', 30)->nullable();
+            $table->string('company', 55)->nullable();
+            $table->text('address')->nullable();
+            $table->string('city', 55)->nullable();
+            $table->string('postcode', 10)->nullable();
+            $table->string('country', 150)->nullable();
+            $table->string('state', 55)->nullable();
+            $table->json('meta')->nullable();
+            $table->timestamp('email_verified_at')->nullable();
+            $table->datetime('last_login_at')->nullable();
+            $table->string('last_login_ip', 45)->nullable();
+            $table->string('provider_id')->nullable();
+            $table->string('provider')->nullable();
+            $table->boolean('active')->default(1);
+            $table->softDeletes();
+            $table->rememberToken();
+            $table->timestamps();
+        });
+
+        Schema::create('password_resets', function (Blueprint $table) {
+            $table->string('email')->index();
+            $table->string('token');
+            $table->timestamp('created_at')->nullable();
+        });
+
+        Schema::create('sessions', function (Blueprint $table) {
+            $table->string('id')->unique();
+            $table->foreignId('user_id')->nullable();
+            $table->string('ip_address', 45)->nullable();
+            $table->text('user_agent')->nullable();
+            $table->text('payload');
+            $table->integer('last_activity');
+        });
+
+        Schema::create('media', function (Blueprint $table) {
+            $table->bigIncrements('id');
+            $table->morphs('model');
+            $table->uuid('uuid')->nullable();
+            $table->string('collection_name');
+            $table->string('name');
+            $table->string('file_name');
+            $table->string('mime_type')->nullable();
+            $table->string('disk');
+            $table->string('conversions_disk')->nullable();
+            $table->unsignedBigInteger('size');
+            $table->json('manipulations');
+            $table->json('custom_properties');
+            $table->json('responsive_images');
+            $table->json('generated_conversions');
+            $table->unsignedInteger('order_column')->nullable();
+            $table->nullableTimestamps();
+        });
+
+        Schema::create('options', function (Blueprint $table) {
+            $table->increments('id');
+            $table->string('key')->unique();
+            $table->longText('value')->nullable();
+            $table->string('tag')->nullable();
+        });
+    }
+
+    public function down()
+    {
+        Schema::dropIfExists('sessions');
+        Schema::dropIfExists('password_resets');
+        Schema::dropIfExists('users');
+        Schema::dropIfExists('media');
+        Schema::dropIfExists('options');
+
+        $tableNames = config('permission.table_names');
+
+        if (empty($tableNames)) {
+            throw new \Exception('Error: config/permission.php not found and defaults could not be merged. Please publish the package configuration before proceeding, or drop the tables manually.');
+        }
+
+        Schema::dropIfExists($tableNames['role_has_permissions']);
+        Schema::dropIfExists($tableNames['model_has_roles']);
+        Schema::dropIfExists($tableNames['model_has_permissions']);
+        Schema::dropIfExists($tableNames['roles']);
+        Schema::dropIfExists($tableNames['permissions']);
     }
 };

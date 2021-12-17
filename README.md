@@ -1,19 +1,9 @@
-# CMS developped by Combind.ma
+# CMS developed by Combind.ma
 
 [![Latest Version on Packagist](https://img.shields.io/packagist/v/combindma/richcms.svg?style=flat-square)](https://packagist.org/packages/combindma/richcms)
 [![GitHub Tests Action Status](https://img.shields.io/github/workflow/status/combindma/richcms/run-tests?label=tests)](https://github.com/combindma/richcms/actions?query=workflow%3Arun-tests+branch%3Amain)
 [![GitHub Code Style Action Status](https://img.shields.io/github/workflow/status/combindma/richcms/Check%20&%20fix%20styling?label=code%20style)](https://github.com/combindma/richcms/actions?query=workflow%3A"Check+%26+fix+styling"+branch%3Amain)
 [![Total Downloads](https://img.shields.io/packagist/dt/combindma/richcms.svg?style=flat-square)](https://packagist.org/packages/combindma/richcms)
-
-This is where your description should go. Limit it to a paragraph or two. Consider adding a small example.
-
-## Support us
-
-[<img src="https://github-ads.s3.eu-central-1.amazonaws.com/richcms.jpg?t=1" width="419px" />](https://spatie.be/github-ad-click/richcms)
-
-We invest a lot of resources into creating [best in class open source packages](https://spatie.be/open-source). You can support us by [buying one of our paid products](https://spatie.be/open-source/support-us).
-
-We highly appreciate you sending us a postcard from your hometown, mentioning which of our package(s) you are using. You'll find our address on [our contact page](https://spatie.be/about-us). We publish all received postcards on [our virtual postcard wall](https://spatie.be/open-source/postcards).
 
 ## Installation
 
@@ -23,16 +13,27 @@ You can install the package via composer:
 composer require combindma/richcms
 ```
 
-You can publish and run the migrations with:
+You must publish and run all needed migrations with:
 
 ```bash
 php artisan vendor:publish --tag="richcms-migrations"
+php artisan vendor:publish --tag="blog-migrations"
+php artisan vendor:publish --tag="newsletter-migrations"
+php artisan vendor:publish --tag="gallery-migrations"
+php artisan vendor:publish --tag="redirector-migrations"
 php artisan migrate
 ```
 
-You can publish the config file with:
+You must publish all the needed config files with:
+
 ```bash
 php artisan vendor:publish --tag="richcms-config"
+php artisan vendor:publish --tag="dashui-config"
+php artisan vendor:publish --tag="backup-config"
+php artisan vendor:publish --tag="redirector-config"
+php artisan vendor:publish --provider="Artesaos\SEOTools\Providers\SEOToolsServiceProvider"
+php artisan vendor:publish --provider="Spatie\MediaLibrary\MediaLibraryServiceProvider" --tag="config"
+php artisan vendor:publish --provider="Vinkla\Hashids\HashidsServiceProvider"
 ```
 
 Optionally, you can publish the views using
@@ -41,29 +42,172 @@ Optionally, you can publish the views using
 php artisan vendor:publish --tag="richcms-views"
 ```
 
-This is the contents of the published config file:
+## Additional packages installation
+
+```bash
+composer require contentful/laravel
+composer require rap2hpoutre/laravel-log-viewer
+composer require livewire/livewire
+```
+
+## Configuration
+
+File richcms.php:
 
 ```php
 return [
+    'admin_url' => env('ADMIN_URL', 'path-to-dashbord'),
+    'admin_email' => env('ADMIN_EMAIL', 'your-email-to-receive-notifications'),
 ];
+```
+
+File dashui.php:
+
+```php
+return [
+    'layout' => 'layout2',  // theme layout
+    'css_path' => '/assets/css/tailwind.css', //path to generated css style for tailwind
+    'js_path' => '/assets/js/alpine.js', //path to generated alpine js file
+];
+```
+
+File filesystems.php:
+
+```php
+return [
+    'default' => env('FILESYSTEM_DRIVER', 'local'),
+    'disks' => [
+        'local' => [
+            'driver' => 'local',
+            'root' => storage_path('app'),
+        ],
+        'public' => [
+            'driver' => 'local',
+            'root' => storage_path('app/public'),
+            'url' => env('APP_URL').'/storage',
+            'visibility' => 'public',
+        ],
+        'images' => [
+            'driver' => 'local',
+            'root' => storage_path('app/public/images'),
+            'url' => env('APP_URL').'/storage/images',
+            'visibility' => 'public',
+        ],
+        'uploads' => [
+            'driver' => 'local',
+            'root' => storage_path('app/public/uploads'),
+            'url' => env('APP_URL').'/storage/uploads',
+            'visibility' => 'public',
+        ],
+        'backups' => [
+            'driver' => 'local',
+            'root'   => storage_path('app/backups'), // that's where your backups are stored by default: storage/backups
+        ],
+        //...
+    ],
+];
+```
+
+File hashids.php:
+
+```php
+return [
+    //...
+    'main' => [
+            'salt' => 'your-salt-string',
+            'length' => 5,
+            'alphabet' => 'abcdefghijklmnopqrstuvwxyz123456789',
+        ],
+    //...
+];
+```
+
+File media-library.php:
+
+```php
+return [
+    //...
+    'queue_name' => 'images',
+    'path_generator' => \Combindma\Richcms\Services\CustomPathGenerator::class,
+    'default_loading_attribute_value' => 'lazy',
+    //...
+];
+```
+
+File App\Exceptions\Handler.php:
+
+```php
+protected function unauthenticated($request, AuthenticationException $exception)
+    {
+        if ($request->expectsJson()) {
+            return response()->json(['message' => $exception->getMessage()], 401);
+        }
+        if ($request->is(config('richcms.admin_url')) || $request->is(config('richcms.admin_url').'/*')) {
+            return redirect()->guest(route('richcms::login'));
+        }
+        return redirect()->guest('/');
+    }
+
+    //Log error with the url where error occured
+    protected function context()
+    {
+        try {
+            $context = array_filter([
+                'url' => Request::fullUrl(),
+                'input' => Request::all(),
+                'userId' => Auth::id(),
+            ]);
+        } catch (Throwable $e) {
+            $context = [];
+        }
+
+        return array_merge($context, parent::context());
+    }
+```
+
+File App\Http\Kernel.php:
+
+```php
+protected $middleware = [
+        //...
+        \Combindma\Redirector\RedirectsMissingPages::class,
+];
+ protected $routeMiddleware = [
+        //...
+        'role' => \Spatie\Permission\Middlewares\RoleMiddleware::class,
+        'permission' => \Spatie\Permission\Middlewares\PermissionMiddleware::class,
+        'role_or_permission' => \Spatie\Permission\Middlewares\RoleOrPermissionMiddleware::class,
+];
+```
+
+If Horizon is installed edit HorizonServiceProvider.php file:
+
+```php
+public function boot()
+    {
+        parent::boot();
+        Horizon::routeMailNotificationsTo(config('richcms.admin_email'));
+    }
+protected function gate()
+    {
+        Gate::define('viewHorizon', function () {
+            if (Auth::check()){
+                return auth()->user()->hasRole(Combindma\Richcms\Enums\Roles::Admin);
+            }
+            return false;
+        });
+    }
 ```
 
 ## Usage
 
-```php
-$richcms = new Combindma\Richcms();
-echo $richcms->echoPhrase('Hello, Combindma!');
-```
+### Seo
 
 ## Testing
 
 ```bash
 composer test
 ```
-
-## Changelog
-
-Please see [CHANGELOG](CHANGELOG.md) for more information on what has changed recently.
 
 ## Contributing
 

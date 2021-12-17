@@ -19,7 +19,7 @@
     verbose="true"
 >
     <testsuites>
-        <testsuite name="Combindma Test Suite">
+        <testsuite name="Richcms Test Suite">
             <directory>tests</directory>
         </testsuite>
     </testsuites>

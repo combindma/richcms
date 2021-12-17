@@ -4,7 +4,6 @@ namespace Combindma\Richcms;
 
 use Spatie\LaravelPackageTools\Package;
 use Spatie\LaravelPackageTools\PackageServiceProvider;
-use Combindma\Richcms\Commands\RichcmsCommand;
 
 class RichcmsServiceProvider extends PackageServiceProvider
 {
@@ -19,7 +18,6 @@ class RichcmsServiceProvider extends PackageServiceProvider
             ->name('richcms')
             ->hasConfigFile()
             ->hasViews()
-            ->hasMigration('create_richcms_table')
-            ->hasCommand(RichcmsCommand::class);
+            ->hasMigration('create_richcms_table');
     }
 }
