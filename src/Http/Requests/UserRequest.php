@@ -8,9 +8,9 @@ use Combindma\Richcms\Rules\EmailRule;
 use Combindma\Richcms\Rules\NameRule;
 use Combindma\Richcms\Rules\PasswordRule;
 use Combindma\Richcms\Rules\PhoneRule;
+use Elegant\Sanitizer\Laravel\SanitizesInput;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
-use Elegant\Sanitizer\Laravel\SanitizesInput;
 
 class UserRequest extends FormRequest
 {
@@ -62,7 +62,7 @@ class UserRequest extends FormRequest
             'country' => ['required', 'string'],
             'role' => ['required','string', new EnumValue(Roles::class, false)],
             'meta.*' => 'nullable|string',
-            'send_email' => 'nullable|boolean'
+            'send_email' => 'nullable|boolean',
         ];
     }
 
@@ -70,7 +70,7 @@ class UserRequest extends FormRequest
     {
         return [
             'name' => ['required', new NameRule()],
-            'email' => ['required', new EmailRule, 'email', Rule::unique('users', 'email')->ignore($this->user)],
+            'email' => ['required', new EmailRule(), 'email', Rule::unique('users', 'email')->ignore($this->user)],
             'password' => ['nullable', new PasswordRule()],
             'phone' => ['nullable', new PhoneRule()],
             'company' => 'nullable|string',
@@ -81,14 +81,14 @@ class UserRequest extends FormRequest
             'country' => ['required', 'string'],
             'role' => ['required', new EnumValue(Roles::class, false)],
             'meta.*' => 'nullable|string',
-            'send_email' => 'nullable|boolean'
+            'send_email' => 'nullable|boolean',
         ];
     }
 
     protected function prepareForValidation()
     {
         $this->merge([
-            'send_email' => $this->send_email??0,
+            'send_email' => $this->send_email ?? 0,
         ]);
     }
 }

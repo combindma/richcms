@@ -20,7 +20,7 @@ class UpdateProfileRequest extends FormRequest
         return [
             'name' => ['required', new NameRule()],
             'email' => ['required', 'email', new EmailRule(), Rule::unique('users')->ignore(auth()->user())],
-            'password' => ['nullable', new PasswordRule()]
+            'password' => ['nullable', new PasswordRule()],
         ];
     }
 }

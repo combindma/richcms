@@ -16,6 +16,7 @@ class UserController
             ->latest('id')
             ->with(['roles'])
             ->paginate(10);
+
         return  view('richcms::users.index', compact('users'));
     }
 
@@ -37,12 +38,12 @@ class UserController
     public function store(UserRequest $request)
     {
         $user = User::create($request->validated());
-        if ($request->send_email)
-        {
+        if ($request->send_email) {
             $user->sendNewAccountNotification($request->validated()['password']);
         }
 
         flash('Ajout effectué avec succès');
+
         return redirect(route('richcms::users.index'));
     }
 
@@ -52,16 +53,16 @@ class UserController
             array_filter($request->validated()),
             ['password']
         ));
-        if ($request->filled('password')){
+        if ($request->filled('password')) {
             $user->updatePassword($request->password);
-            if ($request->send_email)
-            {
+            if ($request->send_email) {
                 $user->sendNewPasswordNotification($request->validated()['password']);
             }
         }
         $user->syncRoles($request->validated()['role']);
         $user->save();
         flash('Enregistrement effectué avec succès');
+
         return back();
     }
 
@@ -69,6 +70,7 @@ class UserController
     {
         $user->activer();
         flash('Compte activé avec succès');
+
         return back();
     }
 
@@ -76,6 +78,7 @@ class UserController
     {
         $user->desactiver();
         flash('Compte desactivé avec succès');
+
         return back();
     }
 
@@ -83,13 +86,15 @@ class UserController
     {
         $user->delete();
         flash('Compte supprimé avec succès');
+
         return back();
     }
 
     public function restore($id)
     {
-        User::withTrashed()->where('id',$id)->restore();
+        User::withTrashed()->where('id', $id)->restore();
         flash('Compte restauré avec succès');
+
         return back();
     }
 }

@@ -5,7 +5,6 @@ namespace Combindma\Richcms\Http\Controllers;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 
-
 class LoginController
 {
     use AuthenticatesUsers;
@@ -29,7 +28,7 @@ class LoginController
         $request->validate([
             'email' => 'required|email|string',
             'password' => 'required|string',
-            config('recaptcha.token_name') => ['required','string', 'recaptcha']
+            config('recaptcha.token_name') => ['required','string', 'recaptcha'],
         ]);
     }
 
@@ -49,6 +48,7 @@ class LoginController
         }
 
         $this->incrementLoginAttempts($request);
+
         return back()->withErrors(['email' => 'Email ou mot de passe incorrect.']);
     }
 
@@ -62,10 +62,11 @@ class LoginController
         $this->guard()->logout();
         $request->session()->invalidate();
         $request->session()->regenerateToken();
+
         return redirect()->route('admin::login');
     }
 
-    function authenticated(Request $request, $user)
+    public function authenticated(Request $request, $user)
     {
         $user->last_login_at = Carbon::now();
         $user->last_login_ip = $request->getClientIp();

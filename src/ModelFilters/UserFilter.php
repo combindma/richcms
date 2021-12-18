@@ -11,8 +11,7 @@ class UserFilter extends ModelFilter
 
     public function type($value)
     {
-        foreach(Roles::getValues() as $role)
-        {
+        foreach (Roles::getValues() as $role) {
             if ($value === $role) {
                 return $this->role($role);
             }

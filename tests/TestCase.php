@@ -22,11 +22,10 @@ class TestCase extends Orchestra
     {
         parent::setUp();
         Factory::guessFactoryNamesUsing(
-            fn(string $modelName) => 'Combindma\\Richcms\\Database\\Factories\\' . class_basename($modelName) . 'Factory'
+            fn (string $modelName) => 'Combindma\\Richcms\\Database\\Factories\\' . class_basename($modelName) . 'Factory'
         );
 
-        foreach(Roles::getValues() as $role)
-        {
+        foreach (Roles::getValues() as $role) {
             Role::create(['name' => $role]);
         }
         $this->app->make(\Spatie\Permission\PermissionRegistrar::class)->registerPermissions();
@@ -46,9 +45,9 @@ class TestCase extends Orchestra
     {
         $app['config']->set('database.default', 'testing');
         $app['config']->set('database.connections.testing', [
-            'driver'   => 'sqlite',
+            'driver' => 'sqlite',
             'database' => ':memory:',
-            'prefix'   => '',
+            'prefix' => '',
         ]);
         $app['config']->set('permission', [
             'table_names' => [
@@ -60,7 +59,7 @@ class TestCase extends Orchestra
             ],
             'column_names' => [
                 'model_morph_key' => 'model_id',
-            ]
+            ],
         ]);
 
         $app['config']->set('auth.providers.users.model', User::class);

@@ -11,6 +11,7 @@ class RichcmsController
     {
         option()->putMany($request->except(['_token', '_method']));
         flash('Enregistrement effectué avec succès');
+
         return back();
     }
 

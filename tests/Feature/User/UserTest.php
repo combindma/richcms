@@ -6,11 +6,11 @@ use Combindma\Richcms\Enums\Country;
 use Combindma\Richcms\Enums\Roles;
 use Combindma\Richcms\Models\User;
 use Illuminate\Support\Facades\Hash;
-use Spatie\Permission\Models\Role;
 use function Pest\Faker\faker;
 use function Pest\Laravel\from;
 use function PHPUnit\Framework\assertCount;
 use function PHPUnit\Framework\assertTrue;
+use Spatie\Permission\Models\Role;
 
 /**
  * Set default data
