@@ -9,7 +9,7 @@ use Combindma\Richcms\Notifications\ResetPassword;
 use Combindma\Richcms\Notifications\VerifyMail;
 use Illuminate\Support\Facades\Hash;
 
-Trait UserTrait
+trait UserTrait
 {
     public function sendEmailVerificationNotification()
     {
@@ -35,11 +35,12 @@ Trait UserTrait
     {
         $query = static::query();
         $user = $query->create(array_merge($attributes, ['password' => Hash::make($attributes['password'])]));
-        if (!empty($attributes['role'])){
+        if (! empty($attributes['role'])) {
             $user->assignRole($attributes['role']);
-        }else{
+        } else {
             $user->assignRole(Roles::Client);
         }
+
         return $user;
     }
 
@@ -47,6 +48,7 @@ Trait UserTrait
     {
         $this->password = Hash::make($password);
         $this->save();
+
         return $this;
     }
 }

@@ -1,8 +1,6 @@
 <?php
 
-
 namespace Combindma\Richcms\Recipients;
-
 
 class AdminRecipient extends Recipient
 {

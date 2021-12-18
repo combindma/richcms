@@ -6,10 +6,10 @@ use BenSampo\Enum\Enum;
 
 final class Roles extends Enum
 {
-    const Client = "client";
-    const Manager = "manager";
-    const Editor = "editor";
-    const Admin = "admin";
+    public const Client = "client";
+    public const Manager = "manager";
+    public const Editor = "editor";
+    public const Admin = "admin";
 
     public static function getDescription($value): string
     {

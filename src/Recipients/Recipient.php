@@ -1,8 +1,6 @@
 <?php
 
-
 namespace Combindma\Richcms\Recipients;
-
 
 use Illuminate\Notifications\Notifiable;
 

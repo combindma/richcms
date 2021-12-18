@@ -46,13 +46,12 @@ php artisan vendor:publish --tag="richcms-views"
 
 ```bash
 composer require contentful/laravel
-composer require rap2hpoutre/laravel-log-viewer
 composer require livewire/livewire
 ```
 
 ## Configuration
 
-File richcms.php:
+File config/richcms.php:
 
 ```php
 return [
@@ -61,7 +60,7 @@ return [
 ];
 ```
 
-File dashui.php:
+File config/dashui.php:
 
 ```php
 return [
@@ -71,7 +70,16 @@ return [
 ];
 ```
 
-File filesystems.php:
+File config/auth.php:
+
+```php
+return [
+    //...
+    'model' => Combindma\Richcms\Models\User::class,
+    //...
+```
+
+File config/filesystems.php:
 
 ```php
 return [
@@ -108,7 +116,7 @@ return [
 ];
 ```
 
-File hashids.php:
+File config/hashids.php:
 
 ```php
 return [
@@ -122,7 +130,7 @@ return [
 ];
 ```
 
-File media-library.php:
+File config/media-library.php:
 
 ```php
 return [
@@ -134,7 +142,7 @@ return [
 ];
 ```
 
-File App\Exceptions\Handler.php:
+File App/Exceptions/Handler.php:
 
 ```php
 protected function unauthenticated($request, AuthenticationException $exception)
@@ -165,7 +173,7 @@ protected function unauthenticated($request, AuthenticationException $exception)
     }
 ```
 
-File App\Http\Kernel.php:
+File App/Http/Kernel.php:
 
 ```php
 protected $middleware = [
@@ -178,6 +186,35 @@ protected $middleware = [
         'permission' => \Spatie\Permission\Middlewares\PermissionMiddleware::class,
         'role_or_permission' => \Spatie\Permission\Middlewares\RoleOrPermissionMiddleware::class,
 ];
+```
+
+File App/Http/Middleware/RedirectIfAuthenticated.php:
+
+```php
+public function handle(Request $request, Closure $next, ...$guards)
+    {
+        //$guards = empty($guards) ? [null] : $guards;
+
+        if (Auth::guard()->check() && $request->is(config('richcms.admin_url').'/*') ) {
+            return redirect()->route('richcms::home');
+        }
+        if (Auth::guard()->check()) {
+            return redirect()->intended(RouteServiceProvider::HOME);
+        }
+
+        return $next($request);
+    }
+```
+
+File app/Http/Middleware/Authenticate.php:
+
+```php
+protected function redirectTo($request)
+    {
+        if (! $request->expectsJson()) {
+            return route('richcms::login');
+        }
+    }
 ```
 
 If Horizon is installed edit HorizonServiceProvider.php file:
@@ -197,6 +234,14 @@ protected function gate()
             return false;
         });
     }
+```
+
+## Routes
+
+Add this to your route file
+
+```bash
+Route::richcms();
 ```
 
 ## Usage

@@ -2,7 +2,7 @@
 
 namespace Combindma\Richcms\Traits;
 
-Trait Bannable
+trait Bannable
 {
     public function scopeActive($query)
     {
@@ -17,13 +17,14 @@ Trait Bannable
     public function activer()
     {
         $this->active = 1;
+
         return $this->save();
     }
 
     public function desactiver()
     {
         $this->active = 0;
-        return $this->save();
 
+        return $this->save();
     }
 }

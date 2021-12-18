@@ -11,7 +11,9 @@ class PasswordChanged extends Notification implements ShouldQueue
 {
     use Queueable;
 
-    public function __construct(){}
+    public function __construct()
+    {
+    }
 
     public function via($notifiable)
     {
@@ -27,10 +29,9 @@ class PasswordChanged extends Notification implements ShouldQueue
 
     public function toMail($notifiable)
     {
-        return (new MailMessage)
+        return (new MailMessage())
             ->subject('Mot de passe modifié')
             ->replyTo(option()->contact_email)
             ->markdown('emails.passwordChanged', compact('notifiable'));
     }
-
 }

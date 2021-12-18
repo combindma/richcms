@@ -1,6 +1,5 @@
 <?php
 
-use Combindma\Richcms\Enums\Roles;
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
@@ -82,10 +81,10 @@ return new class extends Migration {
             ->store(config('permission.cache.store') != 'default' ? config('permission.cache.store') : null)
             ->forget(config('permission.cache.key'));
 
-        foreach(Roles::getValues() as $role)
+        /*foreach(\Combindma\Richcms\Enums\Roles::getValues() as $role)
         {
             Role::create(['name' => $role]);
-        }
+        }*/
 
         Schema::create('users', function (Blueprint $table) {
             $table->id();

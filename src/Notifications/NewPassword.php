@@ -33,7 +33,8 @@ class NewPassword extends Notification implements ShouldQueue
     public function toMail($notifiable)
     {
         $password = $this->password;
-        return (new MailMessage)
+
+        return (new MailMessage())
             ->subject('Nouveau mot de passe ' . config('app.name'))
             ->markdown('emails.newPassword', compact('notifiable', 'password'));
     }

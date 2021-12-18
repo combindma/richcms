@@ -11,7 +11,9 @@ class WelcomeMail extends Notification implements ShouldQueue
 {
     use Queueable;
 
-    public function __construct(){}
+    public function __construct()
+    {
+    }
 
     public function via($notifiable)
     {
@@ -27,7 +29,7 @@ class WelcomeMail extends Notification implements ShouldQueue
 
     public function toMail($notifiable)
     {
-        return (new MailMessage)
+        return (new MailMessage())
             ->subject('Bienvenue sur '.config('app.name'))
             ->replyTo(option()->contact_email)
             ->markdown('emails.welcome', compact('notifiable'));
