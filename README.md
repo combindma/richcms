@@ -22,7 +22,13 @@ php artisan vendor:publish --tag="newsletter-migrations"
 php artisan vendor:publish --tag="gallery-migrations"
 php artisan vendor:publish --tag="redirector-migrations"
 php artisan migrate
+php artisan db:seed --class=Combindma\\Richcms\\Database\\Seeders\\RichcmsSeeder
 ```
+This will create an admin user with these credentials:
+
+email: a@a.a
+
+password: pass
 
 You must publish all the needed config files with:
 
@@ -196,7 +202,7 @@ public function handle(Request $request, Closure $next, ...$guards)
         //$guards = empty($guards) ? [null] : $guards;
 
         if (Auth::guard()->check() && $request->is(config('richcms.admin_url').'/*') ) {
-            return redirect()->route('richcms::home');
+            return redirect(config('richcms.admin_url'));
         }
         if (Auth::guard()->check()) {
             return redirect()->intended(RouteServiceProvider::HOME);

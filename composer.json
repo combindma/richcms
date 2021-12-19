@@ -60,7 +60,8 @@
     "autoload": {
         "psr-4": {
             "Combindma\\Richcms\\": "src",
-            "Combindma\\Richcms\\Database\\Factories\\": "database/factories"
+            "Combindma\\Richcms\\Database\\Factories\\": "database/factories",
+            "Combindma\\Richcms\\Database\\Seeders\\": "database/seeders"
         },
         "files": [
             "src/helpers.php"

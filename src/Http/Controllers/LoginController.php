@@ -3,24 +3,44 @@
 namespace Combindma\Richcms\Http\Controllers;
 
 use Carbon\Carbon;
+use Combindma\Richcms\Enums\Roles;
+use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
+use Illuminate\Foundation\Validation\ValidatesRequests;
 use Illuminate\Http\Request;
+use Illuminate\Routing\Controller as BaseController;
+use Illuminate\Support\Facades\Auth;
 
-class LoginController
+class LoginController extends BaseController
 {
-    use AuthenticatesUsers;
-
-    protected $maxAttempts = 3;
-    protected $decayMinutes = 2;
-    protected $redirectTo = '/dash';
+    use AuthorizesRequests;
+    use ValidatesRequests;
 
     public function __construct()
     {
-        $this->middleware('guest:admin')->except('logout');
+        $this->middleware('guest')->except('logout');
     }
 
     public function showLoginForm()
     {
         return view('richcms::auth.login');
+    }
+
+    public function login(Request $request)
+    {
+        $this->validateLogin($request);
+
+        if ($this->attemptLogin($request)) {
+            if (Auth::user()?->hasAnyRole([ Roles::Admin, Roles::Editor, Roles::Manager])) {
+                $this->authenticated($request, Auth::user());
+
+                return redirect(config('richcms.admin_url'));
+            }
+            Auth::logout();
+            $request->session()->invalidate();
+            $request->session()->regenerateToken();
+        }
+
+        return back()->withErrors(['email' => 'Email ou mot de passe incorrect.']);
     }
 
     protected function validateLogin(Request $request)
@@ -32,41 +52,21 @@ class LoginController
         ]);
     }
 
-    public function login(Request $request)
-    {
-        $this->validateLogin($request);
-
-        if (method_exists($this, 'hasTooManyLoginAttempts') &&
-            $this->hasTooManyLoginAttempts($request)) {
-            $this->fireLockoutEvent($request);
-
-            return $this->sendLockoutResponse($request);
-        }
-
-        if ($this->attemptLogin($request)) {
-            return redirect()->intended(route('admin::home'));
-        }
-
-        $this->incrementLoginAttempts($request);
-
-        return back()->withErrors(['email' => 'Email ou mot de passe incorrect.']);
-    }
-
     protected function attemptLogin(Request $request)
     {
-        return Auth::attempt(['email' => $request->email, 'password' => $request->password], $request->get('remember'));
+        return Auth::attempt(['email' => $request->email, 'password' => $request->password, 'active' => 1], $request->get('remember'));
     }
 
     public function logout(Request $request)
     {
-        $this->guard()->logout();
+        Auth::logout();
         $request->session()->invalidate();
         $request->session()->regenerateToken();
 
-        return redirect()->route('admin::login');
+        return redirect()->action([LoginController::class, 'login']);
     }
 
-    public function authenticated(Request $request, $user)
+    protected function authenticated(Request $request, $user)
     {
         $user->last_login_at = Carbon::now();
         $user->last_login_ip = $request->getClientIp();

@@ -87,7 +87,7 @@
                                             <div class="ml-4">
                                                 <div class="text-sm font-medium">
                                                     @if($user->name)
-                                                        <span class=" text-gray-900">{{ ucwords($user->name) }}</span>
+                                                        <a href="{{ route('richcms::users.edit', $user) }}" class=" text-gray-900">{{ ucwords($user->name) }}</a>
                                                     @else
                                                         <span class="text-red-400">Non renseigné</span>
                                                     @endif
