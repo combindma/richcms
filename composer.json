@@ -38,7 +38,7 @@
         "spatie/laravel-googletagmanager": "^2.6",
         "spatie/laravel-medialibrary": "^9.11",
         "spatie/laravel-package-tools": "^1.9.2",
-        "spatie/laravel-permission": "^5.4",
+        "spatie/laravel-permission": "^5.0",
         "tucker-eric/eloquentfilter": "^3.0",
         "vinkla/hashids": "^9.1",
         "watson/active": "^6.0"

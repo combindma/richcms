@@ -26,9 +26,6 @@ class UserRequest extends FormRequest
         if ($this->getMethod() === 'PUT') {
             return $this->updateRules();
         }
-        if ($this->getMethod() === 'PATCH') {
-            return $this->updateRules();
-        }
 
         return $this->createRules();
     }

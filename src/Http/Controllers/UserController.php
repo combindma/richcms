@@ -17,7 +17,7 @@ class UserController
             ->with(['roles'])
             ->paginate(10);
 
-        return  view('richcms::users.index', compact('users'));
+        return view('richcms::users.index', compact('users'));
     }
 
     public function create()
@@ -49,17 +49,15 @@ class UserController
 
     public function update(UserRequest $request, User $user)
     {
-        $user->update(Arr::except(
-            array_filter($request->validated()),
-            ['password']
-        ));
+        $validatedData = Arr::except($request->validated(), ['password', 'role', 'send_email']);
+        $user->update($validatedData);
         if ($request->filled('password')) {
             $user->updatePassword($request->password);
             if ($request->send_email) {
                 $user->sendNewPasswordNotification($request->validated()['password']);
             }
         }
-        $user->syncRoles($request->validated()['role']);
+        $user->syncRoles($request->input('role'));
         $user->save();
         flash('Enregistrement effectué avec succès');
 

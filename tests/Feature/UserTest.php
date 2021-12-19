@@ -1,16 +1,16 @@
 <?php
 
-namespace Combindma\Richcms\Tests\Feature\User;
+namespace Combindma\Richcms\Tests\Feature;
 
 use Combindma\Richcms\Enums\Country;
 use Combindma\Richcms\Enums\Roles;
+use Combindma\Richcms\Http\Controllers\UserController;
 use Combindma\Richcms\Models\User;
 use Illuminate\Support\Facades\Hash;
 use function Pest\Faker\faker;
 use function Pest\Laravel\from;
 use function PHPUnit\Framework\assertCount;
 use function PHPUnit\Framework\assertTrue;
-use Spatie\Permission\Models\Role;
 
 /**
  * Set default data
@@ -37,9 +37,9 @@ function setData(array $data = [])
 
 test('admin can create an user', function () {
     $data = setData();
-    from(route('richcms::users.create'))
-        ->post(route('richcms::users.store'), $data)
-        ->assertRedirect(route('richcms::users.index'))
+    from(action([UserController::class, 'create']))
+        ->post(action([UserController::class, 'store']), $data)
+        ->assertRedirect(action([UserController::class, 'index']))
         ->assertSessionHasNoErrors();
 
     assertCount(1, $users = User::all());
@@ -52,7 +52,7 @@ test('admin can create an user', function () {
     expect($user->postcode)->toBe($data['postcode']);
     expect($user->city)->toBe($data['city']);
     expect($user->state)->toBe($data['state']);
-    expect($user->country)->toBe($data['country']);
+    expect($user->country->value)->toBe($data['country']);
     assertTrue($user->hasRole($data['role']));
     assertTrue(Hash::check($data['password'], $user->password));
 });
@@ -60,9 +60,9 @@ test('admin can create an user', function () {
 test('admin can update an user', function () {
     $user = User::factory()->create();
     $data = setData();
-    from(route('richcms::users.edit', $user))
-        ->put(route('richcms::users.update', $user), $data)
-        ->assertRedirect(route('richcms::users.edit', $user))
+    from(action([UserController::class, 'edit'], ['user' => $user]))
+        ->put(action([UserController::class, 'update'], ['user' => $user]), $data)
+        ->assertRedirect(action([UserController::class, 'edit'], ['user' => $user]))
         ->assertSessionHasNoErrors();
     $user->refresh();
     expect($user->name)->toBe($data['name']);
@@ -73,16 +73,16 @@ test('admin can update an user', function () {
     expect($user->postcode)->toBe($data['postcode']);
     expect($user->city)->toBe($data['city']);
     expect($user->state)->toBe($data['state']);
-    expect($user->country)->toBe($data['country']);
+    expect($user->country->value)->toBe($data['country']);
     assertTrue($user->hasRole($data['role']));
     assertTrue(Hash::check($data['password'], $user->password));
 });
 
 test('admin can delete user', function () {
     $user = User::factory()->create();
-    from(route('richcms::users.index'))
-        ->delete(route('richcms::users.destroy', $user))
-        ->assertRedirect(route('richcms::users.index'));
+    from(action([UserController::class, 'index']))
+        ->delete(action([UserController::class, 'destroy'], ['user' => $user]))
+        ->assertRedirect(action([UserController::class, 'index']));
     assertCount(0, User::all());
 });
 
@@ -90,18 +90,18 @@ test('admin can restore user', function () {
     $user = User::factory()->create();
     $user->delete();
     assertCount(0, User::all());
-    from(route('richcms::users.index'))
-        ->post(route('richcms::users.restore', $user->id))
-        ->assertRedirect(route('richcms::users.index'));
+    from(action([UserController::class, 'index']))
+        ->post(action([UserController::class, 'restore'], ['id' => $user->id]))
+        ->assertRedirect(action([UserController::class, 'index']));
     assertCount(1, User::all());
 });
 
-test('admin can create user with valid data', function ($formInput, $formInputValue) {
+test('admin can create user with valid data', function (string $formInput, string $formInputValue = '') {
     User::factory()->create(['email' => 'unique@email.com']);
-    $data = setData([$formInput => $formInputValue,]);
-    from(route('richcms::users.create'))
-        ->post(route('richcms::users.store'), $data)
-        ->assertRedirect(route('richcms::users.create'))
+    $data = setData([$formInput => $formInputValue]);
+    from(action([UserController::class, 'create']))
+        ->post(action([UserController::class, 'store']), $data)
+        ->assertRedirect(action([UserController::class, 'create']))
         ->assertSessionHasErrors($formInput);
     assertCount(0, User::all());
 })->with([
@@ -115,14 +115,13 @@ test('admin can create user with valid data', function ($formInput, $formInputVa
     ['role' => 'invalid'],
 ]);
 
-test('admin can update user with valid data', function ($formInput, $formInputValue) {
-    Role::create(['name' => Roles::Client]);
+test('admin can update user with valid data', function (string $formInput, string $formInputValue = '') {
     User::factory()->create(['email' => 'unique@email.com']);
     $user = User::factory()->create(['email' => 'email@exemple.com']);
-    $data = setData([$formInput => $formInputValue,]);
-    from(route('richcms::users.edit', $user))
-        ->put(route('richcms::users.update', $user), $data)
-        ->assertRedirect(route('richcms::users.edit', $user))
+    $data = setData([$formInput => $formInputValue]);
+    from(action([UserController::class, 'edit'], ['user' => $user]))
+        ->put(action([UserController::class, 'update'], ['user' => $user]), $data)
+        ->assertRedirect(action([UserController::class, 'edit'], ['user' => $user]))
         ->assertSessionHasErrors($formInput);
 })->with([
     ['name' => ''],

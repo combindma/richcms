@@ -2,7 +2,6 @@
 
 namespace Combindma\Richcms\Tests;
 
-use Combindma\Richcms\Enums\Roles;
 use Combindma\Richcms\Http\Controllers\LoginController;
 use Combindma\Richcms\Http\Controllers\ProfileController;
 use Combindma\Richcms\Http\Controllers\UserController;
@@ -13,7 +12,6 @@ use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Support\Facades\Route;
 use Orchestra\Testbench\TestCase as Orchestra;
 use Propaganistas\LaravelDisposableEmail\DisposableEmailServiceProvider;
-use Spatie\Permission\Models\Role;
 use Spatie\Permission\PermissionServiceProvider;
 
 class TestCase extends Orchestra
@@ -24,11 +22,6 @@ class TestCase extends Orchestra
         Factory::guessFactoryNamesUsing(
             fn (string $modelName) => 'Combindma\\Richcms\\Database\\Factories\\' . class_basename($modelName) . 'Factory'
         );
-
-        foreach (Roles::getValues() as $role) {
-            Role::create(['name' => $role]);
-        }
-        $this->app->make(\Spatie\Permission\PermissionRegistrar::class)->registerPermissions();
     }
 
     protected function getPackageProviders($app)
@@ -43,13 +36,28 @@ class TestCase extends Orchestra
 
     public function getEnvironmentSetUp($app)
     {
+        //Schema::dropAllTables(); //run MYSQL server by this command: brew services start mysql
+
         $app['config']->set('database.default', 'testing');
         $app['config']->set('database.connections.testing', [
             'driver' => 'sqlite',
             'database' => ':memory:',
             'prefix' => '',
         ]);
+
+        $this->setLaravelPermissions($app);
+
+        $migration = include __DIR__ . '/../database/migrations/create_richcms_table.php.stub';
+        $migration->up();
+    }
+
+    public function setLaravelPermissions($app)
+    {
         $app['config']->set('permission', [
+            'models' => [
+                'permission' => \Spatie\Permission\Models\Permission::class,
+                'role' => \Spatie\Permission\Models\Role::class,
+            ],
             'table_names' => [
                 'roles' => 'roles',
                 'permissions' => 'permissions',
@@ -58,20 +66,26 @@ class TestCase extends Orchestra
                 'role_has_permissions' => 'role_has_permissions',
             ],
             'column_names' => [
+                'role_pivot_key' => null,
+                'permission_pivot_key' => null,
                 'model_morph_key' => 'model_id',
+                'team_foreign_key' => 'team_id',
+                'register_permission_check_method' => true,
+                'display_permission_in_exception' => false,
+                'enable_wildcard_permission' => false,
+            ],
+            'cache' => [
+                'key' => 'spatie.permission.cache',
+                'store' => 'default',
             ],
         ]);
 
         $app['config']->set('auth.providers.users.model', User::class);
-        $app['config']->set('cache.prefix', 'spatie_tests---');
-
-        $migration = include __DIR__ . '/../database/migrations/create_richcms_table.php.stub';
-        $migration->up();
     }
 
     protected function defineRoutes($router)
     {
-        Route::group(['as' => 'richcms::'], function () {
+        Route::group(['prefix' => config('richcms.admin_url'), 'as' => 'richcms::'], function () {
             //Auth
             Route::get('/login', [LoginController::class, 'showLoginForm'])->name('login');
             Route::post('/login', [LoginController::class, 'login']);

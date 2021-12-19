@@ -81,11 +81,6 @@ return new class extends Migration {
             ->store(config('permission.cache.store') != 'default' ? config('permission.cache.store') : null)
             ->forget(config('permission.cache.key'));
 
-        /*foreach(\Combindma\Richcms\Enums\Roles::getValues() as $role)
-        {
-            Role::create(['name' => $role]);
-        }*/
-
         Schema::create('users', function (Blueprint $table) {
             $table->id();
             $table->string('name', 150)->nullable();

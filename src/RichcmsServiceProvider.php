@@ -59,7 +59,7 @@ class RichcmsServiceProvider extends PackageServiceProvider
 
             Route::group(['middleware' => ['auth', 'role:admin|editor|manager']], function () {
                 Blog::routes(config('richcms.admin_url'));
-                //Newsletter::routes(config('richcms.admin_url'));
+                Newsletter::routes(config('richcms.admin_url'));
                 Gallery::routes(config('richcms.admin_url'));
             });
 

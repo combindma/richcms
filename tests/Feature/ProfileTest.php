@@ -1,5 +1,6 @@
 <?php
 
+use Combindma\Richcms\Http\Controllers\ProfileController;
 use Combindma\Richcms\Models\User;
 use Illuminate\Support\Facades\Hash;
 use function Pest\Laravel\actingAs;
@@ -15,9 +16,7 @@ test('admin can update his profile', function () {
         'password' => 'new-password',
     ];
 
-    from(route('richcms::profile'))
-        ->put(route('richcms::profile.update'), $data)
-        ->assertRedirect(route('richcms::profile'));
+    from(action([ProfileController::class, 'index']))->put(action([ProfileController::class, 'update']), $data)->assertRedirect(action([ProfileController::class, 'index']));
     $user->refresh();
     expect($user->name)->toBe($data['name']);
     expect($user->email)->toBe($data['email']);
