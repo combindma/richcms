@@ -21,7 +21,7 @@
         "artesaos/seotools": "^0.20",
         "bensampo/laravel-enum": "^4.1",
         "combindma/backup": "^1.0",
-        "combindma/blog": "1.0.9.1",
+        "combindma/blog": "^1.0",
         "combindma/dashui": "^1.5",
         "combindma/flash": "^1.0",
         "combindma/gallery": "^1.0",
