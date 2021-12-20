@@ -4,17 +4,11 @@ namespace Combindma\Richcms\Http\Controllers;
 
 use Carbon\Carbon;
 use Combindma\Richcms\Enums\Roles;
-use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
-use Illuminate\Foundation\Validation\ValidatesRequests;
 use Illuminate\Http\Request;
-use Illuminate\Routing\Controller as BaseController;
 use Illuminate\Support\Facades\Auth;
 
-class LoginController extends BaseController
+class LoginController extends Controller
 {
-    use AuthorizesRequests;
-    use ValidatesRequests;
-
     public function __construct()
     {
         $this->middleware('guest')->except('logout');

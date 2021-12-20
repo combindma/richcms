@@ -8,7 +8,7 @@ use Combindma\Richcms\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Arr;
 
-class UserController
+class UserController extends Controller
 {
     public function index(Request $request)
     {

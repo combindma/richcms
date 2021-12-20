@@ -37,6 +37,6 @@ class NewAccount extends Notification implements ShouldQueue
         return (new MailMessage())
             ->subject('Bienvenue à ' . config('app.name'))
             ->replyTo(option()->contact_email)
-            ->markdown('emails.newAccount', compact('notifiable', 'password'));
+            ->markdown('richcms::emails.newAccount', compact('notifiable', 'password'));
     }
 }

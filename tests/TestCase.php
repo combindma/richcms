@@ -85,7 +85,7 @@ class TestCase extends Orchestra
 
     protected function defineRoutes($router)
     {
-        Route::group(['prefix' => config('richcms.admin_url'), 'as' => 'richcms::'], function () {
+        Route::group(['as' => 'richcms::', 'middleware' => ['bindings']], function () {
             //Auth
             Route::get('/login', [LoginController::class, 'showLoginForm'])->name('login');
             Route::post('/login', [LoginController::class, 'login']);

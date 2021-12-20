@@ -5,22 +5,10 @@ namespace Combindma\Richcms\Traits;
 use Combindma\Richcms\Enums\Roles;
 use Combindma\Richcms\Notifications\NewAccount;
 use Combindma\Richcms\Notifications\NewPassword;
-use Combindma\Richcms\Notifications\ResetPassword;
-use Combindma\Richcms\Notifications\VerifyMail;
 use Illuminate\Support\Facades\Hash;
 
 trait UserTrait
 {
-    public function sendEmailVerificationNotification()
-    {
-        $this->notify(new VerifyMail());
-    }
-
-    public function sendPasswordResetNotification($token)
-    {
-        $this->notify(new ResetPassword($token));
-    }
-
     public function sendNewAccountNotification($password)
     {
         $this->notify(new NewAccount($password));

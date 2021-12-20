@@ -36,6 +36,6 @@ class NewPassword extends Notification implements ShouldQueue
 
         return (new MailMessage())
             ->subject('Nouveau mot de passe ' . config('app.name'))
-            ->markdown('emails.newPassword', compact('notifiable', 'password'));
+            ->markdown('richcms::emails.newPassword', compact('notifiable', 'password'));
     }
 }

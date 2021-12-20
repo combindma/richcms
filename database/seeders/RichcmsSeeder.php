@@ -16,7 +16,7 @@ class RichcmsSeeder extends Seeder
         }
 
         $user = User::create([
-            'name' => 'administrator',
+            'name' => 'admin',
             'email' => 'a@a.a',
             'password' => 'pass',
             'company' => 'Combind',

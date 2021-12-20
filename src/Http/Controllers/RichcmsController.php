@@ -5,7 +5,7 @@ namespace Combindma\Richcms\Http\Controllers;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Artisan;
 
-class RichcmsController
+class RichcmsController extends Controller
 {
     public function updateSettings(Request $request)
     {

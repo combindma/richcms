@@ -2,11 +2,6 @@
 
 namespace Combindma\Richcms;
 
-use Combindma\Backup\Backup;
-use Combindma\Blog\Blog;
-use Combindma\Gallery\Gallery;
-use Combindma\Newsletter\Facades\Newsletter;
-use Combindma\Redirector\Redirector;
 use Combindma\Richcms\Http\Controllers\LoginController;
 use Combindma\Richcms\Http\Controllers\ProfileController;
 use Combindma\Richcms\Http\Controllers\RichcmsController;
@@ -58,14 +53,14 @@ class RichcmsServiceProvider extends PackageServiceProvider
             });
 
             Route::group(['middleware' => ['auth', 'role:admin|editor|manager']], function () {
-                Blog::routes(config('richcms.admin_url'));
-                Newsletter::routes(config('richcms.admin_url'));
-                Gallery::routes(config('richcms.admin_url'));
+                Route::blog(config('richcms.admin_url'));
+                Route::newsletter(config('richcms.admin_url'));
+                Route::gallery(config('richcms.admin_url'));
             });
 
             Route::group(['middleware' => ['auth', 'role:admin']], function () {
-                Redirector::routes(config('richcms.admin_url'));
-                Backup::routes(config('richcms.admin_url'));
+                Route::backup(config('richcms.admin_url'));
+                Route::redirector(config('richcms.admin_url'));
             });
         });
     }

@@ -5,7 +5,7 @@ namespace Combindma\Richcms\Http\Controllers;
 use Combindma\Richcms\Http\Requests\UpdateProfileRequest;
 use Illuminate\Support\Facades\Hash;
 
-class ProfileController
+class ProfileController extends Controller
 {
     public function index()
     {

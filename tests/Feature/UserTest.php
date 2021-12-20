@@ -12,11 +12,6 @@ use function Pest\Laravel\from;
 use function PHPUnit\Framework\assertCount;
 use function PHPUnit\Framework\assertTrue;
 
-/**
- * Set default data
- *
- * @return array
- */
 function setData(array $data = [])
 {
     return array_merge([
