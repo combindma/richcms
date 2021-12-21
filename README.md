@@ -234,7 +234,7 @@ protected function gate()
     {
         Gate::define('viewHorizon', function () {
             if (Auth::check()){
-                return auth()->user()->hasRole(Combindma\Richcms\Enums\Roles::Admin);
+                return auth()->user()->hasRole(\Combindma\Richcms\Enums\Roles::Admin);
             }
             return false;
         });
