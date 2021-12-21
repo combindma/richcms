@@ -33,6 +33,7 @@
         "illuminate/contracts": "^8.73",
         "illuminatech/validation-composite": "^1.2",
         "laravelium/sitemap": "^8.0",
+        "livewire/livewire": "^2.8",
         "propaganistas/laravel-disposable-email": "^2.1",
         "rap2hpoutre/laravel-log-viewer": "^2.0",
         "spatie/laravel-googletagmanager": "^2.6",
@@ -78,7 +79,10 @@
         "format": "vendor/bin/php-cs-fixer fix --allow-risky=yes"
     },
     "config": {
-        "sort-packages": true
+        "sort-packages": true,
+        "platform": {
+            "php": "8.0"
+        }
     },
     "extra": {
         "laravel": {

@@ -52,7 +52,6 @@ php artisan vendor:publish --tag="richcms-views"
 
 ```bash
 composer require contentful/laravel
-composer require livewire/livewire
 ```
 
 ## Configuration
