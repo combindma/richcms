@@ -41,6 +41,11 @@ php artisan vendor:publish --provider="Artesaos\SEOTools\Providers\SEOToolsServi
 php artisan vendor:publish --provider="Spatie\MediaLibrary\MediaLibraryServiceProvider" --tag="config"
 php artisan vendor:publish --provider="Vinkla\Hashids\HashidsServiceProvider"
 ```
+You must publish assets with:
+
+```bash
+php artisan vendor:publish --tag="blog-assets"
+```
 
 Optionally, you can publish the views using
 
