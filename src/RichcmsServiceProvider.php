@@ -24,6 +24,10 @@ class RichcmsServiceProvider extends PackageServiceProvider
 
     public function packageRegistered()
     {
+        $this->app->bind('richcms', function($app) {
+            return new Richcms();
+        });
+
         Route::macro('richcms', function () {
             Route::group(['prefix' => config('richcms.admin_url'), 'as' => 'richcms::'], function () {
                 //Auth
