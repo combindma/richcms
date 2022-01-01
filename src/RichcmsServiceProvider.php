@@ -24,7 +24,7 @@ class RichcmsServiceProvider extends PackageServiceProvider
 
     public function packageRegistered()
     {
-        $this->app->bind('richcms', function($app) {
+        $this->app->bind('richcms', function ($app) {
             return new Richcms();
         });
 
